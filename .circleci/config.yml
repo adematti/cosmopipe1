@@ -16,8 +16,8 @@ jobs:
           command: |
               export PYTHONPATH=$(pwd):${PYTHONPATH}
               coverage run -a -m pytest .
-              coveralls
               ./codecov-upload.sh
+      - coveralls/upload
 
 workflows:
   main:
