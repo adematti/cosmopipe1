@@ -11,6 +11,7 @@ pylint:
     - unbalanced-tuple-unpacking
     - useless-object-inheritance
     - unidiomatic-typecheck
+    - logging-format-interpolation
 
 pep8:
   disable:

@@ -1,6 +1,8 @@
 API
 ===
 
+The base code for **cosmopipe** is in :root:`cosmopipe/pipeline`.
+
 cosmopipe.pipeline module
 -------------------------
 .. automodule:: cosmopipe.pipeline

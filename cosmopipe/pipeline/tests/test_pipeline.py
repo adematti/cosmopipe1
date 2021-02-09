@@ -14,11 +14,11 @@ data_dir = os.path.join(base_dir,'_data')
 demo_dir = os.path.join(base_dir,'demos')
 data_fn = os.path.join(data_dir,'data_{:d}.txt')
 covariance_fn = os.path.join(data_dir,'covariance.txt')
-os.chdir(base_dir)
 
 
 def test_demo1():
 
+    os.chdir(base_dir)
     config_fn = os.path.join(demo_dir,'demo1.ini')
     graph_fn = os.path.join(demo_dir,'pipe1.ps')
 

@@ -1,6 +1,3 @@
-import os
-import numpy as np
-
 from cosmosis.datablock import names as cosmosis_names
 from cosmosis.datablock import SectionOptions
 

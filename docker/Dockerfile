@@ -2,6 +2,8 @@ FROM ubuntu:18.04
 
 RUN apt -y update && apt install -y apt-utils && echo yes
 
+RUN apt-get update
+
 RUN DEBIAN_FRONTEND=noninteractive \
     apt install -y --no-install-recommends \
     make \
@@ -43,14 +45,14 @@ RUN for x in \
     fitsio \
     matplotlib \
     zmq \
-    ; do pip3 install $x; done \
+    ; do pip3 install "$x"; done \
     && rm -Rf /root/.cache/pip
 
 # set prompt and default shell
 SHELL ["/bin/bash", "-c"]
 ENTRYPOINT ["/bin/bash", "-c"]
 CMD ["/bin/bash"]
-RUN ln -s $(which python3) /usr/bin/python
+RUN ln -s "$(which python3)" /usr/bin/python
 ENV PATH /usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 WORKDIR /src/
 
@@ -62,10 +64,6 @@ RUN curl -L --remote-name https://bitbucket.org/mpaterno/cosmosis-bootstrap/raw/
     && make
 
 ENV PYTHONPATH /src/cosmosis
-
-#RUN apt install graphviz graphviz-dev
-
-RUN apt-get update
 
 RUN DEBIAN_FRONTEND=noninteractive \
     apt install -y --no-install-recommends \
@@ -85,7 +83,8 @@ RUN for x in \
     pytest \
     sphinx \
     sphinx-rtd-theme \
-    ; do pip3 install $x; done \
+    coveralls \
+    ; do pip3 install "$x"; done \
     && rm -Rf /root/.cache/pip
 
 COPY . /src/cosmopipe

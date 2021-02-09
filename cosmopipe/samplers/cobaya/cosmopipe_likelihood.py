@@ -1,7 +1,3 @@
-import os
-import numpy as np
-from typing import Optional
-
 from cobaya.likelihood import Likelihood
 
 from cosmopipe.pipeline import BasePipeline, section_names

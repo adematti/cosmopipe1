@@ -1,4 +1,7 @@
 version: 2.1
+orbs:
+  coveralls: coveralls/coveralls@1.0.6
+  codecov: codecov/codecov@1.1.3
 jobs:
   build-from-docker:
     docker:
@@ -7,18 +10,14 @@ jobs:
       - run:
           name: CPU info
           command: cat /proc/cpuinfo
-      - run:
-          name: install
-          command: pip install coveralls
       - checkout
       - run:
           name: Tests
           no_output_timeout: 30m
           command: |
-              export PYTHONPATH=${PYTHONPATH}:$(pwd)
+              export PYTHONPATH=$(pwd):${PYTHONPATH}
               coverage run -a -m pytest .
-              coveralls
-              ./codecov-upload.sh
+      - codecov/upload
 
 workflows:
   main:

@@ -113,7 +113,7 @@ class DataBlock(UserDict,BaseClass):
         return (section,name) in self.data
 
     def has_section(self, section):
-        return section in self.sections
+        return section in self.sections()
 
     def delete_section(self, section):
         for key in self.data.keys():
@@ -122,10 +122,10 @@ class DataBlock(UserDict,BaseClass):
 
     def rename_section(self, old, new):
         if new in self.sections():
-            raise BlockError('section_exists',section,name)
+            raise BlockError('section_exists',new)
         for (section,name) in self.data.keys():
             if section == old:
-                self.set(new,name,self.data[key])
+                self.set(new,name,self.data[section,name])
 
     def sections(self):
         return [key[0] for key in self.data.keys()]

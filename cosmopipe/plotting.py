@@ -52,7 +52,7 @@ def saveplot(giveax=True):
 def savefig(filename, bbox_inches='tight', pad_inches=0.1, dpi=200, **kwargs):
     """Save matplotlib figure to ``filename``."""
     utils.mkdir(os.path.dirname(filename))
-    logger.info('Saving figure to %s.',filename)
+    logger.info('Saving figure to {}.'.format(filename))
     plt.savefig(filename,bbox_inches=bbox_inches,pad_inches=pad_inches,dpi=dpi,**kwargs)
     plt.close(plt.gcf())
 
@@ -133,7 +133,7 @@ class BasePlottingStyle(object):
         self.projs = sorted(projs)
         if not self.projs: self.projs = [None]
 
-    def y(self,x,y):
+    def y(self, x, y):
         return y
 
     def proj_to_label(self, proj):
@@ -165,7 +165,7 @@ class BasePlottingStyle(object):
     def update(self, **kwargs):
         for key,val in kwargs.items():
             if val is not None:
-                setattr(self,val)
+                setattr(self,key,val)
 
 
 class PowerSpectrumPlottingStyle(BasePlottingStyle):

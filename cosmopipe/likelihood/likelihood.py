@@ -1,10 +1,8 @@
-import os
 import logging
 
 import numpy as np
 
-from cosmopipe.pipeline import BaseModule, BasePipeline, section_names
-from cosmopipe.data import DataVector, CovarianceMatrix
+from cosmopipe.pipeline import BasePipeline, section_names
 
 
 class BaseLikelihood(BasePipeline):
@@ -79,7 +77,9 @@ class JointGaussianLikelihood(GaussianLikelihood):
 
     logger = logging.getLogger('JointGaussianLikelihood')
 
-    def __init__(self, *args, join=[], modules=[], **kwargs):
+    def __init__(self, *args, join=None, modules=None, **kwargs):
+        join = join or []
+        modules = modules or []
         super(JointGaussianLikelihood,self).__init__(*args,modules=join + modules,**kwargs)
         self.join = join + self._get_modules_from_library(self.options.get_string('join',default='').split())
         self.after = [module for module in self.modules if module not in self.join]

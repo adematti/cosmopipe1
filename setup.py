@@ -7,7 +7,7 @@ setup_keywords['name'] = 'cosmopipe'
 setup_keywords['description'] = 'Cosmological pipeline'
 setup_keywords['author'] = 'Arnaud de Mattia'
 setup_keywords['author_email'] = ''
-setup_keywords['license'] = 'GPL3'
+setup_keywords['license'] = 'GPLv3'
 setup_keywords['url'] = 'https://github.com/adematti/cosmopipe'
 sys.path.insert(0,os.path.abspath('cosmopipe/'))
 import version

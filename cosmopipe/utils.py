@@ -57,8 +57,8 @@ def mkdir(filename):
 def savefile(func):
     @functools.wraps(func)
     def wrapper(self, filename, *args, **kwargs):
-        dir = os.path.dirname(filename)
-        mkdir(dir)
+        dirname = os.path.dirname(filename)
+        mkdir(dirname)
         self.logger.info('Saving to {}.'.format(filename))
         return func(self,filename,*args,**kwargs)
     return wrapper
@@ -102,13 +102,16 @@ class OrderedMapping(BaseClass,UserDict):
     def __init__(self, d=None, order=None):
         self.data = d or {}
         if order is not None and not callable(order):
-            keys = order
-            def order(key):
+
+            def order_(key):
                 try:
-                    return keys.index(key)
+                    return order.index(key)
                 except ValueError:
                     return -1
-        self.order = order
+
+            self.order = order_
+        else:
+            self.order = order
 
     def keys(self):
         """Return keys sorted by chronological order in :mod:`legacypipe.runbrick`."""
@@ -127,12 +130,6 @@ class MappingArray(BaseClass):
             self.__dict__.update(array.__dict__)
             return
 
-        def get_dtype(maxint):
-            if dtype is None:
-                nbytes = 2**np.ceil(np.log2(np.ceil((np.log2(maxint+1) + 1.)/8.)))
-                dtype = 'i{:d}'.format(nbytes)
-            return dtype
-
         if mapping is None:
             mapping = np.unique(array).tolist()
             mapping = {m:m for m in mapping}
@@ -146,7 +143,7 @@ class MappingArray(BaseClass):
             self.array = - np.ones_like(array,dtype=dtype)
             array = np.array(array)
             keys = []
-            for key,val in mapping.items():
+            for key in mapping.keys():
                 keys.append(key)
                 self.array[array.astype(type(key)) == key] = keys.index(key)
             self.keys = keys
@@ -168,7 +165,7 @@ class MappingArray(BaseClass):
             return new
 
     def __setitem__(self, name, item):
-        self.array[name] == self.keys.index(item)
+        self.array[name] = self.keys.index(item)
 
     @property
     def shape(self):
@@ -195,8 +192,10 @@ def blockinv(blocks,inv=np.linalg.inv):
     B = np.bmat(blocks[0][1:]).A
     C = np.bmat([b[0].T for b in blocks[1:]]).A.T
     invD = blockinv([b[1:] for b in blocks[1:]],inv=inv)
+
     def dot(*args):
         return np.linalg.multi_dot(args)
+
     invShur = inv(A - dot(B,invD,C))
     return np.bmat([[invShur,-dot(invShur,B,invD)],[-dot(invD,C,invShur), invD + dot(invD,C,invShur,B,invD)]]).A
 

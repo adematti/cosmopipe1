@@ -233,9 +233,9 @@ class DataVector(BaseClass):
                 file.write('{}projection = {}\n'.format(comments,json.dumps(True)))
             for ix,x in enumerate(self._x):
                 if self.has_proj():
-                    file.write('{} {:{fmt}} {:{fmt}}\n'.format(self._proj[ix],self._x[ix],self._y[ix],fmt=fmt))
+                    file.write('{} {:{fmt}} {:{fmt}}\n'.format(self._proj[ix],x,self._y[ix],fmt=fmt))
                 else:
-                    file.write('{:{fmt}} {:{fmt}}\n'.format(self._x[ix],self._y[ix],fmt=fmt))
+                    file.write('{:{fmt}} {:{fmt}}\n'.format(x,self._y[ix],fmt=fmt))
 
     def __getstate__(self):
         state = super(DataVector,self).__getstate__()

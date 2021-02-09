@@ -1,6 +1,4 @@
-import re
 import logging
-import copy
 import json
 
 import numpy as np
@@ -203,7 +201,8 @@ class CovarianceMatrix(DataVector):
             for ix1,x1 in enumerate(self._x[0]._x):
                 for ix2,x2 in enumerate(self._x[1]._x):
                     if self._x[0].has_proj():
-                        file.write('{} {} {:{fmt}} {:{fmt}} {:{fmt}}\n'.format(self._x[0]._proj[ix1],self._x[1]._proj[ix2],x1,x2,self._covariance[ix1,ix2],fmt=fmt))
+                        file.write('{} {} {:{fmt}} {:{fmt}} {:{fmt}}\n'.format(self._x[0]._proj[ix1],self._x[1]._proj[ix2],x1,x2,\
+                                                                                self._covariance[ix1,ix2],fmt=fmt))
                     else:
                         file.write('{:{fmt}} {:{fmt}} {:{fmt}}\n'.format(x1,x2,self._cov[ix1,ix2],fmt=fmt))
 
@@ -247,7 +246,8 @@ class CovarianceMatrix(DataVector):
                 label1,label2 = styles[0].proj_to_label(styles[0].projs[i]),styles[1].proj_to_label(styles[1].projs[j])
                 if label1 is not None or label2 is not None:
                     text = '{}\nx {}'.format(label1,label2)
-                    ax.text(0.05,0.95,text,horizontalalignment='left',verticalalignment='top',transform=ax.transAxes,color='black',fontsize=styles[0].labelsize)
+                    ax.text(0.05,0.95,text,horizontalalignment='left',verticalalignment='top',\
+                            transform=ax.transAxes,color='black',fontsize=styles[0].labelsize)
 
         suplabel('x',styles[0].xlabel,shift=0,labelpad=17,size=styles[0].labelsize)
         suplabel('y',styles[1].xlabel,shift=0,labelpad=17,size=styles[0].labelsize)

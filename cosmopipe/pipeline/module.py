@@ -31,14 +31,14 @@ class BaseModule(BaseClass):
         self.set_config_block(options=options,config_block=config_block)
         self.set_data_block(data_block=data_block)
 
-    def set_config_block(self, config_block=None, options=None):
+    def set_config_block(self, options=None, config_block=None):
         self.config_block = ConfigBlock(config_block)
         if options is not None:
             for name,value in options.items():
                 self.config_block[self.name,name] = value
         self.options = SectionBlock(self.config_block,self.name)
 
-    def set_data_block(self,data_block=None):
+    def set_data_block(self, data_block=None):
         self.data_block = data_block if data_block is not None else DataBlock()
 
     def setup(self):
@@ -65,7 +65,7 @@ class BaseModule(BaseClass):
         filename = os.path.join(base_dir,module_file)
         cls.logger.info('Importing library {} for module [{}].'.format(filename,name))
         dirname,filename = os.path.split(filename)
-        impname,ext = os.path.splitext(filename)
+        impname = os.path.splitext(filename)[0]
         if os.path.isfile(os.path.join(dirname,'__init__.py')):
             sys.path.insert(0,os.path.dirname(dirname))
             mname = '.'.join([os.path.basename(dirname),impname])
@@ -139,7 +139,7 @@ class BasePipeline(BaseModule):
         for module in self:
             self.config_block.update(module.config_block)
         for module in self:
-            module.set_config_block(self.config_block)
+            module.set_config_block(config_block=self.config_block)
         self.options = SectionBlock(self.config_block,self.name)
 
     def set_data_block(self, data_block=None):
