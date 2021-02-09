@@ -44,7 +44,7 @@ and a common covariance matrix ``cov``. Our parameter ``.ini`` file would then b
 
   [cov]
   module_file = data/covariance.py
-  ;details about how to get the commone covariance
+  ;details about how to get the common covariance
 
 
 One can achieve the same thing in Python with (for a theory model called ``FlatModel``):
