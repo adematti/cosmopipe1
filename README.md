@@ -1,4 +1,5 @@
 [![Documentation Status](https://readthedocs.org/projects/cosmopipe/badge/?version=latest)](https://cosmopipe.readthedocs.io/en/latest/?badge=latest)
+[![Build Status](https://img.shields.io/circleci/project/github/adematti/cosmopipe.svg)](https://circleci.com/gh/adematti/cosmopipe)
 
 # cosmopipe
 
