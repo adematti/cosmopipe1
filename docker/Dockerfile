@@ -85,6 +85,7 @@ RUN for x in \
     pytest \
     sphinx \
     sphinx-rtd-theme \
+    coveralls \
     ; do pip3 install $x; done \
     && rm -Rf /root/.cache/pip
 

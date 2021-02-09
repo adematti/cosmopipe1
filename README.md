@@ -1,3 +1,5 @@
+[![Documentation Status](https://readthedocs.org/projects/cosmopipe/badge/?version=latest)](https://cosmopipe.readthedocs.io/en/latest/?badge=latest)
+
 # cosmopipe
 
 WARNING: In construction!
