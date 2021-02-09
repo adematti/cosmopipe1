@@ -1,3 +1,4 @@
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/55b06e65b41a4e9abef6d24720afdb68)](https://app.codacy.com/gh/adematti/cosmopipe?utm_source=github.com&utm_medium=referral&utm_content=adematti/cosmopipe&utm_campaign=Badge_Grade)
 [![Documentation Status](https://readthedocs.org/projects/cosmopipe/badge/?version=latest)](https://cosmopipe.readthedocs.io/en/latest/?badge=latest)
 [![Build Status](https://img.shields.io/circleci/project/github/adematti/cosmopipe.svg)](https://circleci.com/gh/adematti/cosmopipe)
 
