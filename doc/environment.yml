@@ -1,0 +1,12 @@
+name: cosmopipe-docs
+
+channels:
+- defaults
+- conda-forge
+
+dependencies:
+- python=3.8
+- numpy
+- scipy
+- matplotlib
+- sphinx

@@ -1,0 +1,1 @@
+from .cosmopipe_likelihood import CosmoPipeLikelihood

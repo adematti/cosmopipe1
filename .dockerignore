@@ -1,0 +1,15 @@
+doc/_build/
+**/__pycache__
+**/pytest_cache
+**/*.egg
+**/*.egg-info
+**/.astropy
+**/.cache
+**/.config
+**/.wget*
+**/dist
+**/eggs
+**/_data
+
+# Unit test / coverage reports
+**/.coverage

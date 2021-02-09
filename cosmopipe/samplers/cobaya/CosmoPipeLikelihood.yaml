@@ -1,0 +1,13 @@
+config_file: placeholder.ini
+
+params:
+  a:
+    prior:
+      min: -10
+      max:  10
+    ref:
+      dist: norm
+      loc:   0
+      scale: 0.25
+    latex: a
+    proposal: 0.25

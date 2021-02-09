@@ -1,0 +1,26 @@
+version: 2.1
+jobs:
+  build-from-docker:
+    docker:
+      - image: adematti/cosmopipe:dev
+    steps:
+      - run:
+          name: CPU info
+          command: cat /proc/cpuinfo
+      - run:
+          name: install
+          command: pip install coveralls
+      - checkout
+      - run:
+          name: Tests
+          no_output_timeout: 30m
+          command: |
+              export PYTHONPATH=${PYTHONPATH}:$(pwd)
+              coverage run -a -m pytest .
+              coveralls
+              ./codecov-upload.sh
+
+workflows:
+  main:
+    jobs:
+      - build-from-docker
