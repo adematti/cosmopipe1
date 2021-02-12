@@ -1,7 +1,5 @@
 import logging
 
-import numpy as np
-
 from cosmopipe.pipeline import BasePipeline, section_names
 
 

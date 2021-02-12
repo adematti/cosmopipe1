@@ -138,8 +138,8 @@ def test_demo4():
     pipeline.data_block[section_names.parameters,'a_model1'] = 0.
     test_error()
     pipeline.data_block[section_names.parameters,'b_model1'] = 0.
-    assert (section_names.globals,'y_data1') in pipeline.data_block
-    assert (section_names.globals,'y_data2') not in pipeline.data_block
+    assert (section_names.common,'y_data1') in pipeline.data_block
+    assert (section_names.common,'y_data2') not in pipeline.data_block
     pipeline.cleanup()
 
 

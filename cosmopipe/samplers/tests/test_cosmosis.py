@@ -20,7 +20,6 @@ def test_internal():
     os.chdir(base_dir)
     mapping_proj = ['ell_0','ell_2','ell_4']
     make_data_covariance(data_fn=data_fn,covariance_fn=covariance_fn,mapping_proj=mapping_proj)
-    import cosmosis
     try: # not finished
         main(config='demo3.ini')
     except CosmosisConfigurationError:

@@ -23,6 +23,7 @@ RUN DEBIAN_FRONTEND=noninteractive \
 RUN for x in \
   git+https://github.com/CobayaSampler/cobaya \
   pygraphviz \
+  coverage \
   sphinx \
   sphinx-rtd-theme \
   ; do pip install $x; done \

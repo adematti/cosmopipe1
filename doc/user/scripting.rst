@@ -121,14 +121,14 @@ performed at some position in the tree. This is made possible by using the keywo
   copy = section1.name1,section2.name2
 
 will (shallow!) copy the element from entry (``section1``, ``name1``) to entry (``section2``, ``name2``).
-There are three global (i.e. shared by all modules whatever their depth) sections: 'globals', 'parameters' (which contains potentially varying parameters)
-and 'likelihood' (which containts 'loglkl', the log-likelihood evaluation). So taking ``section2 = 'globals'`` will make the element accessible anywhere
+There are three global (i.e. shared by all modules whatever their depth) sections: 'common', 'parameters' (which contains potentially varying parameters)
+and 'likelihood' (which containts 'loglkl', the log-likelihood evaluation). So taking ``section2 = 'common'`` will make the element accessible anywhere
 in the pipeline.
 
 To summarise:
   - we allow for a tree-like structure
   - any change to ``data_block`` is local within a given (sub)pipeline
-  - the sections where changes are globals (effective for the whole pipeline) are 'globals', 'parameters', 'likelihoods'
+  - the sections where changes are global (effective for the whole pipeline) are 'common', 'parameters', 'likelihoods'
   - if necessary, any entry of ``data_block`` can be moved anywhere (including the 'global' sections) with the keyword ``copy`` in the configuration file/dictionary
   - ``config_block`` is always global.
 

@@ -1,5 +1,4 @@
 import os
-import sys
 import logging
 import importlib
 
@@ -70,11 +69,13 @@ class BaseModule(BaseClass):
     def __getattribute__(self, name):
         if name in ['setup','execute']:
             fun = super(BaseModule,self).__getattribute__(name)
+
             def wrapper(*args,**kwargs):
                 toret = fun(*args,**kwargs)
                 for keyg,keyl in self._copy.items():
                     self.data_block[keyg] = self.data_block[keyl]
                 return toret
+
             return wrapper
         return super(BaseModule,self).__getattribute__(name)
 
@@ -96,8 +97,8 @@ class BaseModule(BaseClass):
                 raise ModuleError('Failed importing module [{}]. Both module file and module name are provided!'.format(name))
             filename = os.path.join(base_dir,module_file)
             cls.logger.info('Importing library {} for module [{}].'.format(filename,name))
-            dirname,filename = os.path.split(filename)
-            impname = os.path.splitext(filename)[0]
+            basename = os.path.basename(filename)
+            impname = os.path.splitext(basename)[0]
             spec = importlib.util.spec_from_file_location(impname,filename)
             library = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(library)

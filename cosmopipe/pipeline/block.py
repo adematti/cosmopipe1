@@ -185,7 +185,7 @@ class DataBlock(BaseClass):
             raise e
         try:
             value = json.loads(value)
-        except json.decoder.JSONDecodeError as e:
+        except json.decoder.JSONDecodeError:
             if callable(catch):
                 value = catch(value)
             elif not catch:
@@ -205,7 +205,7 @@ class DataBlock(BaseClass):
     def put(self, section, name, value):
         if self.has_value(section, name):
             raise BlockError('put_exists',section,name)
-        self.set(section,name)
+        self.set(section,name,value)
 
     def replace(self, section, name, value):
         if not self.has_value(section,name):
@@ -245,9 +245,9 @@ class DataBlock(BaseClass):
             sections = self.sections()
         else:
             sections = [section]
-        for section in sections:
-            for name in self[section]:
-                yield section,name
+        for sec in sections:
+            for name in self[sec]:
+                yield sec,name
 
     def __str__(self):
         return str(self.data)
@@ -259,7 +259,7 @@ class DataBlock(BaseClass):
 
     def __setitem__(self, section_name, value):
         if isinstance(section_name,tuple):
-            return self.set(*section_name,value)
+            self.set(*section_name,value)
         self.data[self.mapping.get(section_name)] = value
 
     def __delitem__(self, section_name):
@@ -290,8 +290,9 @@ class DataBlock(BaseClass):
             return self.data.update(other)
         return self.data.update(other.data)
 
-    def datacopy(self, nocopy=section_names.nocopy):
-        nocopy = nocopy or []
+    def datacopy(self, nocopy=None):
+        if nocopy is None:
+            nocopy = section_names.nocopy
         new = super(DataBlock,self).copy()
         new.data = self.data.copy()
         for section in nocopy:
@@ -330,8 +331,8 @@ class SectionBlock(object):
     def __getitem__(self, key):
         return self.block[self.section,key]
 
-    def __setitem__(self, key):
-        return self.block[self.section,key]
+    def __setitem__(self, key, value):
+        self.block[self.section,key] = value
 
     def keys(self):
         return (name for section,name in self.block.keys(section=self.section))

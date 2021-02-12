@@ -37,7 +37,7 @@ class BaseParamBlock(UserList):
     def __setitem__(self, name, item):
         if isinstance(name,str):
             if item.name != name:
-                raise KeyError('Parameter {} should be indexed by name'.format(item.name,name))
+                raise KeyError('Parameter {} should be indexed by name (incorrect {})'.format(item.name,name))
             try:
                 name = self._get_index(name)
             except ValueError:
@@ -103,7 +103,8 @@ class Param(BaseClass):
             if fixed.lower() in convert:
                 fixed = convert[fixed.lower()]
             else:
-                raise ParamError('Cannot convert fixed = {} into a boolean for parameter {}; it should be one of {}'.format(fixed,self.name,list(convert.keys())))
+                raise ParamError('Cannot convert fixed = {} into a boolean for parameter {};\
+                                it should be one of {}'.format(fixed,self.name,list(convert.keys())))
         self.fixed = bool(fixed)
 
     def add_suffix(self, suffix):
@@ -182,13 +183,13 @@ class BasePrior(BaseClass):
         return 0
 
     def isin(self, x):
-        return  x > self.limit[0] and x < self.limit[1]
+        return  self.limit[0] < x < self.limit[1]
 
     def __call__(self, x):
         raise NotImplementedError
 
     def __setstate__(self,state):
-        super(UniformPrior,self).__setstate__(state)
+        super(BasePrior,self).__setstate__(state)
         self.set_limit(self.limit)
 
     def __getstate__(self):
