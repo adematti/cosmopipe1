@@ -15,8 +15,7 @@ class BaseLikelihood(BasePipeline):
 
     def set_data(self):
         self.data = self.pipe_block[section_names.data,'y']
-        for key in self.pipe_block.keys(section=section_names.data):
-            self.data_block[key] = self.pipe_block[key]
+        self.data_block[section_names.data] = self.pipe_block[section_names.data]
 
     def set_model(self):
         self.model = self.data_block[section_names.model,'y'] = self.pipe_block[section_names.model,'y']
@@ -64,8 +63,6 @@ class SumLikelihood(BaseLikelihood):
         BasePipeline.setup(self)
 
     def execute(self):
-        for key in self.data_block.keys(section=section_names.parameters):
-            self.pipe_block[key] = self.data_block[key]
         loglkl = 0
         for module in self:
             module.execute()
@@ -100,8 +97,6 @@ class JointGaussianLikelihood(GaussianLikelihood):
         self.set_covariance()
 
     def execute(self):
-        for key in self.data_block.keys(section=section_names.parameters):
-            self.pipe_block[key] = self.data_block[key]
         join = {}
         for module in self.join:
             module.execute()

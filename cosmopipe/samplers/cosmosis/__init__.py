@@ -1,1 +1,2 @@
-from .cosmopipe_likelihood import CosmoPipeLikelihood
+from .likelihood import CosmoPipeLikelihood
+from .sampler import CosmosisSampler

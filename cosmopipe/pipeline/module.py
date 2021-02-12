@@ -1,12 +1,14 @@
 import os
 import sys
 import logging
+import importlib
 
 from .. import utils
 from ..utils import BaseClass
-from .block import DataBlock, SectionBlock
+from .block import Mapping, DataBlock, SectionBlock
 from . import section_names
 from .config import ConfigBlock
+from .param import ParamBlock
 
 
 class ModuleError(Exception):
@@ -16,8 +18,8 @@ class ModuleError(Exception):
 def _import_pygraphviz():
     try:
         import pygraphviz as pgv
-    except ImportError:
-        raise ImportError('Please install pygraphviz: see https://github.com/pygraphviz/pygraphviz/blob/master/INSTALL.txt')
+    except ImportError as e:
+        raise ImportError('Please install pygraphviz: see https://github.com/pygraphviz/pygraphviz/blob/master/INSTALL.txt') from e
     return pgv
 
 
@@ -29,6 +31,7 @@ class BaseModule(BaseClass):
         self.name = name
         self.logger.info('Init module {}.'.format(self))
         self.set_config_block(options=options,config_block=config_block)
+        self.set_parameters()
         self.set_data_block(data_block=data_block)
 
     def set_config_block(self, options=None, config_block=None):
@@ -38,8 +41,22 @@ class BaseModule(BaseClass):
                 self.config_block[self.name,name] = value
         self.options = SectionBlock(self.config_block,self.name)
 
+    def set_parameters(self):
+        self.parameters = ParamBlock(self.options.get_string('common_parameters',None))
+        mapping = {}
+        specific = ParamBlock(self.options.get_string('specific_parameters',None))
+        for param in specific:
+            param.add_suffix(self.name)
+            mapping[section_names.parameters,param] = (section_names.parameters,param.name)
+        self.parameters.update(specific)
+        self._mapping = Mapping(self.options.get_string('mapping',''))
+        self._mapping.update(mapping)
+        self._copy = Mapping(self.options.get_string('copy',''))
+
     def set_data_block(self, data_block=None):
-        self.data_block = data_block if data_block is not None else DataBlock()
+        self.data_block = DataBlock(data_block,mapping=self._mapping)
+        for param in self.parameters:
+            self.data_block[section_names.parameters,param.name] = param.value
 
     def setup(self):
         raise NotImplementedError
@@ -50,6 +67,17 @@ class BaseModule(BaseClass):
     def cleanup(self):
         raise NotImplementedError
 
+    def __getattribute__(self, name):
+        if name in ['setup','execute']:
+            fun = super(BaseModule,self).__getattribute__(name)
+            def wrapper(*args,**kwargs):
+                toret = fun(*args,**kwargs)
+                for keyg,keyl in self._copy.items():
+                    self.data_block[keyg] = self.data_block[keyl]
+                return toret
+            return wrapper
+        return super(BaseModule,self).__getattribute__(name)
+
     def __str__(self):
         return '{} [{}]'.format(self.__class__.__name__,self.name)
 
@@ -58,22 +86,25 @@ class BaseModule(BaseClass):
 
         options = options or {}
         base_dir = options.get('base_dir',utils.get_base_dir())
-        try:
-            module_file = options.get('module_file')
-        except KeyError:
-            raise ModuleError('Failed importing module [{}]. You must provide a module file!'.format(name))
-        filename = os.path.join(base_dir,module_file)
-        cls.logger.info('Importing library {} for module [{}].'.format(filename,name))
-        dirname,filename = os.path.split(filename)
-        impname = os.path.splitext(filename)[0]
-        if os.path.isfile(os.path.join(dirname,'__init__.py')):
-            sys.path.insert(0,os.path.dirname(dirname))
-            mname = '.'.join([os.path.basename(dirname),impname])
-            library = __import__(mname,fromlist=[impname])
+        module_file = options.get('module_file',None)
+        module_name = options.get('module_name',None)
+        if module_file is None and module_name is None:
+            raise ModuleError('Failed importing module [{}]. You must provide a module file or a module name!'.format(name))
+
+        if module_file is not None:
+            if module_name is not None:
+                raise ModuleError('Failed importing module [{}]. Both module file and module name are provided!'.format(name))
+            filename = os.path.join(base_dir,module_file)
+            cls.logger.info('Importing library {} for module [{}].'.format(filename,name))
+            dirname,filename = os.path.split(filename)
+            impname = os.path.splitext(filename)[0]
+            spec = importlib.util.spec_from_file_location(impname,filename)
+            library = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(library)
         else:
-            sys.path.insert(0,dirname)
-            library = __import__(impname)
-        sys.path.pop(0)
+            cls.logger.info('Importing module {} for module [{}].'.format(module_name,name))
+            library = importlib.import_module(module_name)
+            impname = module_name.split('.')[-1]
 
         module_class = options.get('module_class','Module')
         if hasattr(library,module_class):
@@ -142,9 +173,14 @@ class BasePipeline(BaseModule):
             module.set_config_block(config_block=self.config_block)
         self.options = SectionBlock(self.config_block,self.name)
 
+    def set_parameters(self):
+        super(BasePipeline,self).set_parameters()
+        for module in self:
+            self.parameters.update(module.parameters)
+
     def set_data_block(self, data_block=None):
         super(BasePipeline,self).set_data_block(data_block=data_block)
-        self.pipe_block = self.data_block.copy() # shallow copy
+        self.pipe_block = self.data_block.datacopy() # shallow copy
         for module in self:
             module.set_data_block(self.pipe_block)
 
@@ -163,10 +199,13 @@ class BasePipeline(BaseModule):
             module.setup()
 
     def execute(self):
-        for key in self.data_block.keys(section=section_names.parameters):
-            self.pipe_block[key] = self.data_block[key]
         for module in self:
             module.execute()
+
+    def execute_parameter_values(self, **kwargs):
+        for name,value in kwargs.items():
+            self.data_block[section_names.parameters,name] = value
+        self.execute()
 
     def cleanup(self):
         for module in self:

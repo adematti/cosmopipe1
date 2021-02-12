@@ -1,23 +1,28 @@
 import configparser
 import yaml
+import logging
 
-from .block import DataBlock
+from .block import DataBlock, Mapping
 
 
 class BaseConfigBlock(DataBlock):
 
-    def __init__(self, filename=None, string='', json_on_str=False):
+    logger = logging.getLogger('BaseConfigBlock')
+
+    def __init__(self, filename=None, string='', json_on_str=False, parse=None):
         self.filename = filename
+        if parse is not None: self.parse = parse
         if filename is not None:
             with open(filename, 'r') as file:
                 string = file.read()
-        self.data = self.decode(string) if string else {}
+        self.data = self.parse(string) if string else {}
+        self.mapping = Mapping()
         if json_on_str:
             self.apply_json(copy=False)
 
     def apply_json(self, copy=True):
         if copy:
-            new = self.copy()
+            new = self.datacopy()
         else:
             new = self
         for (section,name),value in self.items():
@@ -32,23 +37,21 @@ class BaseConfigBlock(DataBlock):
         return state
 
 
-class YamlConfigBlock(BaseConfigBlock):
-
-    @staticmethod
-    def decode(string):
-        config = yaml.safe_load(string)
-        data = {(section,name):value for section in config for name,value in config[section].items()}
-        return data
+def parse_yaml(string):
+    config = yaml.safe_load(string)
+    data = dict(config)
+    return data
 
 
-class IniConfigBlock(BaseConfigBlock):
-
-    @staticmethod
-    def decode(string):
-        config = configparser.ConfigParser()
-        config.read_string(string)
-        data = {(section,name):value for section in config for name,value in config[section].items()}
-        return data
+def parse_ini(string):
+    config = configparser.ConfigParser()
+    config.read_string(string)
+    data = {}
+    for section in config.sections():
+        data[section] = {}
+        for name in config[section]:
+            data[section][name] = config[section][name]
+    return data
 
 
 def ConfigBlock(filename=None):
@@ -58,5 +61,5 @@ def ConfigBlock(filename=None):
     if isinstance(filename,BaseConfigBlock):
         return filename
     if filename.endswith('.ini'):
-        return IniConfigBlock(filename)
-    return YamlConfigBlock(filename)
+        return BaseConfigBlock(filename,parse=parse_ini)
+    return BaseConfigBlock(filename,parse=parse_yaml)

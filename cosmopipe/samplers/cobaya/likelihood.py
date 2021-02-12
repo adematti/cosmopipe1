@@ -14,9 +14,9 @@ class CosmoPipeLikelihood(Likelihood):
 
     def logp(self, **kwargs):
         for key,val in kwargs.items():
-            self.pipeline.pipe_block[section_names.parameters,key] = val
+            self.pipeline.data_block[section_names.parameters,key] = val
         self.pipeline.execute()
-        return self.pipeline.pipe_block[section_names.likelihood,'loglkl']
+        return self.pipeline.data_block[section_names.likelihood,'loglkl']
 
     def clean(self):
         pass

@@ -1,6 +1,7 @@
 import os
+import yaml
 
-from cosmopipe.pipeline import BaseModule, BasePipeline, ConfigBlock, SectionBlock, section_names
+from cosmopipe.pipeline import BaseModule, BasePipeline, ConfigBlock, SectionBlock, BlockError, section_names
 from cosmopipe.theory import FlatModel
 from cosmopipe.likelihood import BaseLikelihood, JointGaussianLikelihood
 from cosmopipe.utils import setup_logging
@@ -8,7 +9,6 @@ from cosmopipe.utils import setup_logging
 from cosmopipe.data.tests.test_data import make_data_covariance
 
 
-setup_logging()
 base_dir = os.path.dirname(os.path.realpath(__file__))
 data_dir = os.path.join(base_dir,'_data')
 demo_dir = os.path.join(base_dir,'demos')
@@ -28,11 +28,12 @@ def test_demo1():
     pipeline = BasePipeline(config_block=config_fn)
     pipeline.plot_pipeline_graph(graph_fn)
     pipeline.setup()
+    pipeline.data_block[section_names.parameters,'a'] = 0.
     pipeline.execute()
-    loglkl = pipeline.pipe_block[section_names.likelihood,'loglkl']
-    pipeline.pipe_block[section_names.parameters,'a'] = 4.
+    loglkl = pipeline.data_block[section_names.likelihood,'loglkl']
+    pipeline.data_block[section_names.parameters,'a'] = 4.
     pipeline.execute()
-    assert pipeline.pipe_block[section_names.likelihood,'loglkl'] != loglkl
+    assert pipeline.data_block[section_names.likelihood,'loglkl'] != loglkl
     pipeline.cleanup()
 
     graph_fn = os.path.join(demo_dir,'inheritance.ps')
@@ -50,17 +51,24 @@ def test_demo2():
     pipeline = BasePipeline(config_block=config_fn)
     pipeline.plot_pipeline_graph(graph_fn)
     pipeline.setup()
+    pipeline.data_block[section_names.parameters,'a'] = 0.
     pipeline.execute()
-    loglkl = pipeline.pipe_block[section_names.likelihood,'loglkl']
-    pipeline.pipe_block[section_names.parameters,'a'] = 4.
+    loglkl = pipeline.data_block[section_names.likelihood,'loglkl']
+    pipeline.data_block[section_names.parameters,'a'] = 4.
     pipeline.execute()
-    assert pipeline.pipe_block[section_names.likelihood,'loglkl'] != loglkl
+    assert pipeline.data_block[section_names.likelihood,'loglkl'] != loglkl
     pipeline.cleanup()
 
 
 def test_demo3():
 
-    for config_fn in [os.path.join(demo_dir,'demo3.ini'),os.path.join(demo_dir,'demo3.yaml')]:
+    config_fn_ini = os.path.join(demo_dir,'demo3.ini')
+    config_fn_yaml = os.path.join(demo_dir,'demo3.yaml')
+    config = ConfigBlock(config_fn_ini)
+    with open(config_fn_yaml,'w') as file:
+        yaml.dump(config.data, file)
+
+    for config_fn in [config_fn_ini,config_fn_yaml]:
 
         graph_fn = os.path.join(demo_dir,'pipe3.ps')
 
@@ -69,11 +77,10 @@ def test_demo3():
         pipeline = BasePipeline(config_block=config_fn)
         pipeline.plot_pipeline_graph(graph_fn)
         pipeline.setup()
-        pipeline.execute()
-        loglkl = pipeline.pipe_block[section_names.likelihood,'loglkl']
-        pipeline.pipe_block[section_names.parameters,'a'] = 4.
-        pipeline.execute()
-        assert pipeline.pipe_block[section_names.likelihood,'loglkl'] != loglkl
+        pipeline.execute_parameter_values(a=0.)
+        loglkl = pipeline.data_block[section_names.likelihood,'loglkl']
+        pipeline.execute_parameter_values(a=4.)
+        assert pipeline.data_block[section_names.likelihood,'loglkl'] != loglkl
         pipeline.cleanup()
 
 
@@ -96,11 +103,12 @@ def test_demo3b():
     pipeline = BasePipeline(modules=[like])
     pipeline.plot_pipeline_graph(graph_fn)
     pipeline.setup()
+    pipeline.data_block[section_names.parameters,'a'] = 0.
     pipeline.execute()
-    loglkl = pipeline.pipe_block[section_names.likelihood,'loglkl']
-    pipeline.pipe_block[section_names.parameters,'a'] = 4.
+    loglkl = pipeline.data_block[section_names.likelihood,'loglkl']
+    pipeline.data_block[section_names.parameters,'a'] = 4.
     pipeline.execute()
-    assert pipeline.pipe_block[section_names.likelihood,'loglkl'] != loglkl
+    assert pipeline.data_block[section_names.likelihood,'loglkl'] != loglkl
     pipeline.cleanup()
 
 
@@ -114,14 +122,32 @@ def test_demo4():
     pipeline = BasePipeline(config_block=config_fn)
     pipeline.plot_pipeline_graph(graph_fn)
     pipeline.setup()
-    pipeline.execute()
+    pipeline.data_block[section_names.parameters,'a'] = 0.
+    del pipeline.data_block[section_names.parameters,'a_model1']
+    del pipeline.data_block[section_names.parameters,'b_model1']
+
+    def test_error():
+        ok = False
+        try:
+            pipeline.execute()
+        except BlockError:
+            ok = True
+        assert ok
+
+    test_error()
+    pipeline.data_block[section_names.parameters,'a_model1'] = 0.
+    test_error()
+    pipeline.data_block[section_names.parameters,'b_model1'] = 0.
+    assert (section_names.globals,'y_data1') in pipeline.data_block
+    assert (section_names.globals,'y_data2') not in pipeline.data_block
     pipeline.cleanup()
 
 
 if __name__ == '__main__':
 
+    setup_logging()
     test_demo1()
     test_demo2()
     test_demo3()
     test_demo3b()
-    #test_demo4()
+    test_demo4()

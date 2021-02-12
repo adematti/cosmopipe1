@@ -13,8 +13,10 @@ class CosmoPipeLikelihood(object):
         self.pipeline.setup()
 
     def execute(self, block):
+        for section,name in block.keys(section=cosmosis_names.cosmological_parameters):
+            self.pipeline.data_block[section_names.parameters,name] = block[section,name]
         self.pipeline.execute()
-        block[cosmosis_names.likelihoods,'cosmopipe_like'] = self.pipeline.pipe_block[section_names.likelihood,'loglkl']
+        block[cosmosis_names.likelihoods,'cosmopipe_like'] = self.pipeline.data_block[section_names.likelihood,'loglkl']
 
     def cleanup(self):
         self.pipeline.cleanup()

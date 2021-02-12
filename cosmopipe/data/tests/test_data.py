@@ -7,7 +7,6 @@ from cosmopipe import utils
 from cosmopipe.utils import setup_logging
 
 
-setup_logging()
 base_dir = os.path.dirname(os.path.realpath(__file__))
 data_dir = os.path.join(base_dir,'_data')
 data_fn = os.path.join(data_dir,'_data_{:d}.txt')
@@ -113,5 +112,6 @@ def test_covariance():
 
 if __name__ == '__main__':
 
+    setup_logging()
     test_data_vector()
     test_covariance()

@@ -9,8 +9,8 @@ Welcome to cosmopipe's documentation!
   :caption: User documentation
 
   user/building
-  user/module
-  user/example
+  user/framework
+  user/scripting
   api/api
 
 .. toctree::
@@ -45,23 +45,23 @@ and run with the correct versions.
 This would be possible by running the codes inside the safe, controlled environment of a `Docker`_ container.
 
 Our collaborators should not have to worry about having the correct parameter files for each code, nor how to connect the output of one code
-to the input of another. Ideally, they should only have to deal with **one** (provided) parameter file and **one** output,
-and should not need to know anything about cosmology in general.
-This would be possible by linking ourselves all codes together, through a **pipeline**.
+to the input of another. Ideally, they should only have to deal with *one* (provided) parameter file and *one* output,
+and should not need to know anything about cosmology in general to rerun our analysis.
+This would be possible by linking all our codes together to form a *pipeline*.
 
-This **pipeline** could be made flexible enough to cover the clustering analyses of the collaboration. For this, we should not have **one** pipeline,
-but a framework to **script** pipelines. For example, once I have the codes (hereafter :ref:`user-module`) to model 2 and 3-pt correlation functions
-(as well as their covariance), it should be straightforward for me to run a join 2 and 3-pt analyses, without coding anything else.
+This *pipeline* could be made flexible enough to cover the clustering analyses of the collaboration. For this, we should not have *one* pipeline,
+but a framework to *script* pipelines. For example, once codes (hereafter *modules*, see :ref:`user-framework`) to model 2 and 3-pt correlation functions
+(as well as their covariance) are available, it should be straightforward for anyone to run a joint 2 and 3-pt analysis, without coding anything else.
 
-Eventually, it should be made **very** easy to code and include new modules, without the need for a global view of the pipeline.
+Eventually, it should be made *very* easy to code and include new modules, without the need for a global view of the pipeline.
 This would be possible by providing a simple module architecture to copy and fill, with either Python, C, C++ or Fortran code.
 
-This is all very similar to `CosmoSIS`_ used by the DES collaboration. DESI deserves such a framework as well!
+These should be the key features of **cosmopipe**, quite similar to `CosmoSIS`_ used by the DES collaboration.
 
 Quick start-up
 ==============
 
-For a quick start-up, see :ref:`user-example`.
+For a quick start-up, see :ref:`user-scripting`.
 
 Acknowledgements
 ================
